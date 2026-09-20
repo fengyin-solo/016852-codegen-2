@@ -1,6 +1,6 @@
 import { beforeAll, afterAll, afterEach } from 'vitest'
 
-// Mock localStorage
+// Mock localStorage（DOM 环境下注入到 window，纯 Node 环境下注入到 globalThis）
 const localStorageMock = (() => {
   let store: Record<string, string> = {}
   return {
@@ -17,8 +17,11 @@ const localStorageMock = (() => {
   }
 })()
 
-Object.defineProperty(window, 'localStorage', {
+const target = (globalThis as { window?: typeof globalThis }).window ?? globalThis
+Object.defineProperty(target, 'localStorage', {
   value: localStorageMock,
+  configurable: true,
+  writable: true,
 })
 
 beforeAll(() => {

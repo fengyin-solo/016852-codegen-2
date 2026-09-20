@@ -42,8 +42,9 @@
 
 .sidebar-content {
   flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .sidebar-footer {
@@ -58,15 +59,15 @@
 }
 
 /* Scrollbar */
-.sidebar-content::-webkit-scrollbar {
+.conversation-list::-webkit-scrollbar {
   width: 4px;
 }
 
-.sidebar-content::-webkit-scrollbar-track {
+.conversation-list::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.sidebar-content::-webkit-scrollbar-thumb {
+.conversation-list::-webkit-scrollbar-thumb {
   background: var(--color-border);
   border-radius: 2px;
 }

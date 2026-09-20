@@ -1,0 +1,7 @@
+.search-highlight {
+  background: var(--color-warning);
+  color: inherit;
+  padding: 0 1px;
+  border-radius: 2px;
+  font-weight: var(--font-weight-medium);
+}
