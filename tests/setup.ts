@@ -1,6 +1,6 @@
 import { beforeAll, afterAll, afterEach } from 'vitest'
 
-// Mock localStorage
+// Mock localStorage（node 环境下没有 window/localStorage）
 const localStorageMock = (() => {
   let store: Record<string, string> = {}
   return {
@@ -17,9 +17,27 @@ const localStorageMock = (() => {
   }
 })()
 
-Object.defineProperty(window, 'localStorage', {
-  value: localStorageMock,
-})
+if (typeof globalThis.localStorage === 'undefined') {
+  Object.defineProperty(globalThis, 'localStorage', {
+    value: localStorageMock,
+    configurable: true,
+  })
+}
+
+if (typeof globalThis.window !== 'undefined') {
+  Object.defineProperty(window, 'localStorage', {
+    value: localStorageMock,
+    configurable: true,
+  })
+}
+
+// node 环境下提供最小 btoa/atob（storage 服务会用到）
+if (typeof globalThis.btoa === 'undefined') {
+  globalThis.btoa = (input: string) => Buffer.from(input, 'binary').toString('base64')
+}
+if (typeof globalThis.atob === 'undefined') {
+  globalThis.atob = (input: string) => Buffer.from(input, 'base64').toString('binary')
+}
 
 beforeAll(() => {
   // Setup before all tests

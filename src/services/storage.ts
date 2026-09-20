@@ -1,5 +1,6 @@
 import type { AppConfig, Conversation, PromptTemplate } from '../types';
 import { DEFAULT_CONFIG, DEFAULT_TEMPLATES } from '../types';
+import { compareConversations } from '../utils/conversationSearch';
 
 // Storage keys
 const STORAGE_KEYS = {
@@ -144,10 +145,10 @@ export function loadConversations(): Conversation[] {
       return [];
     }
     
-    // 过滤无效数据并按更新时间排序
+    // 过滤无效数据并按更新时间排序（次序稳定，刷新后仍与列表一致）
     return parsed
       .filter(conv => conv && conv.id && Array.isArray(conv.messages))
-      .sort((a, b) => b.updatedAt - a.updatedAt);
+      .sort(compareConversations);
   } catch (error) {
     console.error('Failed to load conversations:', error);
     return [];

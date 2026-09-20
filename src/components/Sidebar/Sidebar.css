@@ -34,6 +34,24 @@
   border-bottom: 1px solid var(--color-border);
 }
 
+.sidebar-search {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.conversation-search-input {
+  border-radius: var(--radius-full);
+  background: var(--color-bg-tertiary);
+}
+
+.search-clear-button {
+  padding: 0;
+  height: auto;
+  color: var(--color-text-tertiary);
+  display: inline-flex;
+  align-items: center;
+}
+
 .sidebar-new .ant-btn {
   height: 40px;
   border-radius: var(--radius-md);

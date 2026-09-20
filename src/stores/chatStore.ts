@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import type { Conversation, Message, CreateMessageParams } from '../types';
 import { saveConversations, loadConversations } from '../services/storage';
 import { generateConversationTitle } from '../utils/formatters';
+import { compareConversations } from '../utils/conversationSearch';
 
 interface ChatState {
   /** 对话列表 */
@@ -65,6 +66,15 @@ const debouncedSave = (conversations: Conversation[]) => {
   }, 500);
 };
 
+// 保证时间戳单调递增：同一毫秒内连续新建对话/发消息时，
+// 后产生的对话仍然排在前面，内存次序与刷新后的排序结果保持一致。
+let lastTimestamp = 0;
+const nextTimestamp = (): number => {
+  const now = Date.now();
+  lastTimestamp = now > lastTimestamp ? now : lastTimestamp + 1;
+  return lastTimestamp;
+};
+
 export const useChatStore = create<ChatStore>((set, get) => ({
   // Initial state
   conversations: [],
@@ -88,7 +98,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
 
   createConversation: (title) => {
     const id = uuidv4();
-    const now = Date.now();
+    const now = nextTimestamp();
     
     const newConversation: Conversation = {
       id,
@@ -134,7 +144,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
 
   addMessage: (conversationId, params) => {
     const messageId = uuidv4();
-    const now = Date.now();
+    const now = nextTimestamp();
     
     const newMessage: Message = {
       id: messageId,
@@ -164,8 +174,8 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         };
       });
       
-      // 重新排序（按更新时间降序）
-      conversations.sort((a, b) => b.updatedAt - a.updatedAt);
+      // 重新排序（按更新时间降序，时间相同用创建时间与 id 兜底，保证次序稳定）
+      conversations.sort(compareConversations);
       
       debouncedSave(conversations);
       return { conversations };
@@ -187,10 +197,10 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         return {
           ...conv,
           messages,
-          updatedAt: Date.now(),
+          updatedAt: nextTimestamp(),
         };
       });
-      
+
       debouncedSave(conversations);
       return { conversations };
     });
@@ -198,7 +208,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
 
   startStreaming: (conversationId) => {
     const messageId = uuidv4();
-    const now = Date.now();
+    const now = nextTimestamp();
     
     const streamingMessage: Message = {
       id: messageId,
@@ -271,12 +281,12 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         return {
           ...conv,
           messages,
-          updatedAt: Date.now(),
+          updatedAt: nextTimestamp(),
         };
       });
-      
+
       debouncedSave(conversations);
-      
+
       return {
         conversations,
         isStreaming: false,

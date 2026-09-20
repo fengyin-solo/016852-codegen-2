@@ -5,15 +5,67 @@
   padding: var(--spacing-sm);
 }
 
+/* 请求刷新期间保留旧结果，轻微弱化，避免内容闪烁 */
+.conversation-list.is-loading {
+  opacity: 0.6;
+  transition: opacity var(--transition-fast);
+}
+
 .conversation-list-empty {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--spacing-xl);
+  padding: var(--spacing-xl) var(--spacing-md);
   color: var(--color-text-tertiary);
 }
 
-.conversation-list-empty .ant-empty-description {
+.conversation-list-empty .ant-empty-description,
+.conversation-list-empty-text {
   color: var(--color-text-tertiary);
   font-size: var(--font-size-sm);
+}
+
+/* 加载 / 失败等反馈区域 */
+.conversation-list-feedback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-xl) var(--spacing-md);
+  text-align: center;
+}
+
+.conversation-list-error {
+  gap: var(--spacing-xs);
+}
+
+.conversation-feedback-title {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+
+.conversation-feedback-desc {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+  word-break: break-word;
+}
+
+/* 回到选中对话所在页 */
+.conversation-locate-button {
+  margin-top: var(--spacing-xs);
+}
+
+/* 分页 */
+.conversation-pagination {
+  display: flex;
+  justify-content: center;
+  padding: var(--spacing-sm) 0 var(--spacing-xs);
+}
+
+.conversation-pagination .ant-pagination {
+  margin: 0;
 }

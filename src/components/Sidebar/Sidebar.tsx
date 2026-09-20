@@ -2,8 +2,11 @@
 import { Button, Tooltip } from 'antd';
 import { PlusOutlined, SettingOutlined } from '@ant-design/icons';
 import { ConversationList } from './ConversationList';
+import { SearchBar } from './SearchBar';
 import { useChatStore } from '../../stores/chatStore';
 import { useUIStore } from '../../stores/uiStore';
+import { useConversationSearchStore } from '../../stores/conversationSearchStore';
+import { useConversationSearch } from '../../hooks/useConversationSearch';
 import './Sidebar.css';
 
 /**
@@ -20,7 +23,30 @@ export function Sidebar() {
 
   const { setConfigPanelVisible, setMobileDrawerOpen } = useUIStore();
 
+  const {
+    query,
+    setQuery,
+    resetQuery,
+    setPage,
+  } = useConversationSearchStore();
+
+  const {
+    status,
+    errorMessage,
+    pagedItems,
+    total,
+    page: currentPage,
+    totalPages,
+    isSearching,
+    isActiveOffPage,
+    locateActive,
+    retry,
+  } = useConversationSearch();
+
   const handleNewConversation = () => {
+    // 检索状态下新建对话：立即退出检索并回到第一页，
+    // 保证新对话立刻出现在列表里并保持选中
+    resetQuery();
     createConversation();
     setMobileDrawerOpen(false);
   };
@@ -60,18 +86,36 @@ export function Sidebar() {
         </Button>
       </div>
 
+      <div className="sidebar-search">
+        <SearchBar value={query} onChange={setQuery} loading={status === 'loading'} />
+      </div>
+
       <div className="sidebar-content">
         <ConversationList
-          conversations={conversations}
+          items={pagedItems}
           activeId={activeConversationId}
           onSelect={handleSelectConversation}
           onDelete={deleteConversation}
+          status={status}
+          errorMessage={errorMessage}
+          onRetry={retry}
+          page={currentPage}
+          totalPages={totalPages}
+          total={total}
+          onPageChange={setPage}
+          isSearching={isSearching}
+          conversationCount={conversations.length}
+          isActiveOffPage={isActiveOffPage}
+          onLocateActive={locateActive}
+          onClearSearch={resetQuery}
         />
       </div>
 
       <div className="sidebar-footer">
         <span className="sidebar-footer-text">
-          共 {conversations.length} 个对话
+          {isSearching
+            ? `命中 ${total} / 共 ${conversations.length} 个对话`
+            : `共 ${conversations.length} 个对话`}
         </span>
       </div>
     </div>

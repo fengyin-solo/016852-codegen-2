@@ -69,6 +69,18 @@
   color: var(--color-text-tertiary);
 }
 
+/* 检索命中高亮 */
+.conversation-highlight {
+  background: rgba(245, 158, 11, 0.25);
+  color: inherit;
+  padding: 0 1px;
+  border-radius: var(--radius-sm);
+}
+
+.conversation-item.active .conversation-highlight {
+  background: rgba(99, 102, 241, 0.25);
+}
+
 .conversation-actions {
   position: absolute;
   right: var(--spacing-sm);
